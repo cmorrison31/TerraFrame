@@ -58,6 +58,16 @@ class EarthBase(ABC):
 
         return omega_star
 
+    def radius_geocentric(self, lat_geocentric):
+        e2 = self.eccentricity() ** 2
+
+        # (Radius / a)^2
+        roa2 = (1.0 - e2) / (1.0 - e2 * math.cos(lat_geocentric)**2)
+
+        r = self.semi_major_axis() * math.sqrt(roa2)
+
+        return r
+
     def cartesian_from_lat_lon_alt(self, lat, lon, alt):
         """
         This function takes in a geodetic latitude, longitude, altitude and
@@ -85,6 +95,34 @@ class EarthBase(ABC):
         x = (n_phi + alt) * math.cos(lat) * math.cos(lon)
         y = (n_phi + alt) * math.cos(lat) * math.sin(lon)
         z = ((1.0 - self.eccentricity() ** 2) * n_phi + alt) * math.sin(lat)
+
+        return x, y, z
+
+    @staticmethod
+    def cartesian_from_geocentric_lat_lon_radius(lat, lon, radius):
+        """
+        This function takes in a geocentric latitude, longitude, radius and
+        computes the cartesian x, y, and z coordinates. Radius is distance
+        from the ellipsoid center.
+
+        Note that geodetic latitude is not the same as geocentric latitude
+        (longitude however, is the same). Geocentric latitude is the angle
+        between the position vector from the origin and the equatorial plane.
+        Geodetic latitude is the angle between the normal to the spheroid and
+        the equatorial plane. If you don't know which you want, you want
+        geodetic latitude. If no qualifier is given, 99% of the time latitude
+        means geodetic latitude.
+
+        :param lat: Geodetic latitude in radians
+        :param lon: Geodetic longitude in radians
+        :param radius: Distance to the ellipsoid center
+        :return: x, y, z geodetic cartesian coordinates
+        :rtype: float, float, float
+        """
+
+        x = radius * math.cos(lat) * math.cos(lon)
+        y = radius * math.cos(lat) * math.sin(lon)
+        z = radius * math.sin(lat)
 
         return x, y, z
 
@@ -189,6 +227,29 @@ class EarthBase(ABC):
         radius = math.sqrt(x ** 2 + y ** 2 + z ** 2)
 
         return lat, lon, radius
+
+    def geodetic_to_geocentric(self, lat, lon, alt=0.0):
+        """
+        This function takes in geodetic latitude, longitude, and altitude and
+        computes the corresponding geocentric latitude, longitude, and radius
+        from ellipsoid center.
+
+        :param lat: Geodetic latitude in radians
+        :type lat: float
+        :param lon: Geodetic longitude in radians
+        :type lon: float
+        :param alt: Height above ellipsoid in meters
+        :type alt: float
+        :return: Geocentric latitude, longitude, radius
+        rtype: float, float, float
+        """
+
+        x, y, z = self.cartesian_from_lat_lon_alt(lat, lon, alt)
+
+        lat_geo, lon_geo, r = self.geocentric_lat_lon_radius_from_cartesian(
+            x, y, z)
+
+        return lat_geo, lon_geo, r
 
 
 class SphericalEarth(EarthBase):

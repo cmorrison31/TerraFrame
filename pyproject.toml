@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "numpy"]
+requires = ["setuptools", "build", "twine"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -28,7 +28,6 @@ classifiers = [
 dependencies = ["numpy", "platformdirs", "requests"]
 
 [project.optional-dependencies]
-dev = ["build", "twine", "setuptools"]
 animation = ["manim"]
 test = ["pytest", "pyerfa", "astropy"]
 
@@ -42,4 +41,4 @@ package-dir = {"" = "src"}
 where = ["src"]
 
 [tool.setuptools.package-data]
-"TerraFrame.Data" = ["*.txt"]
+"TerraFrame.Data" = ["*.txt", "*.bin"]

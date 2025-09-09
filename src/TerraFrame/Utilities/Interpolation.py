@@ -13,7 +13,6 @@ class Interpolation1D:
 
     Since most queries will be near each other, there is an index cache. If
     the index is out of bounds, the first or last values are used.
-
     """
 
     def __init__(self, x, y):
