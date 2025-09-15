@@ -50,9 +50,10 @@ Reference Systems Service (IERS). The original data along with additional
 information can be found on the IERS website:
 [here.](https://www.iers.org/IERS/EN/DataProducts/EarthOrientationData/eop.html)
 
-The [Astropy](https://www.astropy.org/) and
-[PyERFA](https://pypi.org/project/pyerfa/) libraries have been used as
-invaluable sources of truth for the testing of TerraFrame.
+The [Astropy](https://www.astropy.org/),
+[PyERFA](https://pypi.org/project/pyerfa/), and 
+[GeographicLib](https://geographiclib.sourceforge.io/index.html) libraries have 
+been used as invaluable sources of truth for the testing of TerraFrame.
 
 This project would not have been possible without the technical information
 provided by the following sources:
