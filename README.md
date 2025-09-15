@@ -29,9 +29,15 @@ space efficiency. Most near earth modeling & simulation applications will not
 need to exceed degree and order 100 per WGS84 guidance.
 
 ## Ancillary Functionality
-Support is provided for converting from geodetic latitude, longitude, and height above ellipsoid to geocentric cartesian coordinates or vice versa. The WGS84 spheroid and a simple spherical earth are provided as built-in options.
+Support is provided for converting from geodetic latitude, longitude, and 
+height above ellipsoid to geocentric cartesian coordinates or vice versa. The 
+WGS84 spheroid and a simple spherical earth are provided as built-in options.
 
-TerraFrame also provides robust datetime and timescale conversion functionality that is fully leap second aware. Conversions between UTC, UT1, TT, and TAI are provided. The user is encouraged to not work in UTC directly to avoid leap second ambiguity. Conversion to UTC from TT or TAI can be safely done in post-processing.
+TerraFrame also provides robust datetime and timescale conversion functionality 
+that is fully leap second aware. Conversions between UTC, UT1, TT, and TAI are 
+provided. The user is encouraged to not work in UTC directly to avoid leap 
+second ambiguity. Conversion to UTC from TT or TAI can be safely done in 
+post-processing.
 
 ![Animation of CGRS to ITRS Transformation](https://raw.githubusercontent.com/cmorrison31/TerraFrame/main/Animations%20and%20Plots/GCRS_to_ITRS.gif)
 
