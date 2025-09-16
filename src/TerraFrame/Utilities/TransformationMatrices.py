@@ -90,6 +90,35 @@ def r3(psi):
     return r
 
 
+def dr3dt(psi, dpsi_dt):
+    """
+    This function computes the time derivative of the R3 rotation matrix. As
+    per Kaplan (2005), R3 is defined as:
+
+    [A] rotation matrix to transform column 3-vectors from one cartesian
+    coordinate system to another. Final system is formed by rotating original
+    system about its own z-axis by angle φ (counterclockwise as viewed from
+    the +z direction):
+
+    Source:
+    Kaplan, G. H., 2005, U.S. Naval Observatory Circular No. 179 (Washington:
+    USNO), page xi
+
+    :param psi: Input rotation angle in radians
+    :param dpsi_dt: The time derivative of psi where dt is in seconds
+    :return: dR3dt matrix
+    :type psi: float
+    :type dpsi_dt: float
+    :rtype: np.ndarray
+    """
+
+    dr_dt = np.array([[-np.sin(psi) * dpsi_dt, np.cos(psi) * dpsi_dt, 0.0],
+                      [-np.cos(psi) * dpsi_dt, -np.sin(psi) * dpsi_dt, 0.0],
+                      [0.0, 0.0, 0.0]])
+
+    return dr_dt
+
+
 def euler_angles_from_transformation(t_m):
     """
     This function takes a transformation matrix and calculates the corresponding
