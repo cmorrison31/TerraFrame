@@ -4,8 +4,6 @@
 
 import datetime
 
-from scipy.differentiate import derivative
-
 import TerraFrame.Utilities.Conversions
 from TerraFrame.PrecessionNutation import SeriesExpansion
 from TerraFrame.Utilities import (Conversions, Time, BulletinData,
