@@ -40,7 +40,7 @@ class Interpolation1D:
 
         return index
 
-    def __call__(self, xv):
+    def __call__(self, xv, derivative=False):
         xv = ensure_iterable(xv)
 
         yv = len(xv) * [0.0]
@@ -62,7 +62,12 @@ class Interpolation1D:
             x2 = self._x[index]
             x1 = self._x[index - 1]
 
-            yv[i] = (y2 - y1) / (x2 - x1) * (xv[i] - x1) + y1
+            m = (y2 - y1) / (x2 - x1)
+
+            if not derivative:
+                yv[i] = m * (xv[i] - x1) + y1
+            else:
+                yv[i] = m
 
         if len(yv) == 1:
             return yv[0]

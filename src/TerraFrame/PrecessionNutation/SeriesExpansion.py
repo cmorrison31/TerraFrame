@@ -52,14 +52,21 @@ class CipCoordinate(SeriesExpansion):
         super().__init__(data_file_path)
         self._polynomial_coefficients = polynomial_coefficients
 
-    def compute(self, t):
+    def compute(self, t, derivative=False):
         t = float(t)
 
         # units are micro-arcseconds
         poly_part = 0.0
+        poly_part_dt = 0.0
 
         for j in range(len(self._polynomial_coefficients)):
             poly_part += self._polynomial_coefficients[j] * t ** j
+
+        if derivative:
+            for j in range(1, len(self._polynomial_coefficients)):
+                poly_part_dt += self._polynomial_coefficients[j] * t ** (j - 1)
+
+        # TODO: Finish adding derivative stuff below
 
         # Initialize all the argument parameters. "argument" is the term that
         # IERS uses to refer to the input to the trigonometric functions. The
