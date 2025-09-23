@@ -66,12 +66,11 @@ class CipCoordinate(SeriesExpansion):
             for j in range(1, len(self._polynomial_coefficients)):
                 poly_part_dt += self._polynomial_coefficients[j] * t ** (j - 1)
 
-        # TODO: Finish adding derivative stuff below
-
         # Initialize all the argument parameters. "argument" is the term that
         # IERS uses to refer to the input to the trigonometric functions. The
         # order is tightly coupled with the file format.
         arguments = np.zeros((14, ))
+        d_arguments_dt = np.zeros((14, ))
 
         arguments[0] = Arguments.mean_anomaly_of_the_moon(t) # l
         arguments[1] = Arguments.mean_anomaly_of_the_sun(t) # l'
@@ -89,7 +88,39 @@ class CipCoordinate(SeriesExpansion):
         arguments[12] = Arguments.mean_longitude_of_neptune(t) # L_Ne
         arguments[13] = Arguments.general_precession_in_longitude(t) # p_A
 
+        if derivative:
+            d_arguments_dt[0] = Arguments.mean_anomaly_of_the_moon_derivative(t)
+            d_arguments_dt[1] = Arguments.mean_anomaly_of_the_sun_derivative(t)
+            d_arguments_dt[2] = (
+                Arguments
+                .mean_longitude_moon_minus_ascending_node_derivative(t)
+            )
+            d_arguments_dt[3] = (
+                Arguments
+                .mean_elongation_of_the_moon_from_the_sun_derivative(t)
+            )
+            d_arguments_dt[4] = (
+                Arguments
+                .mean_longitude_of_the_ascending_node_of_the_moon_derivative(t)
+            )
+            d_arguments_dt[5] = Arguments.mean_longitude_of_mercury_derivative()
+            d_arguments_dt[6] = Arguments.mean_longitude_of_venus_derivative()
+            d_arguments_dt[7] = Arguments.mean_longitude_of_earth_derivative()
+            d_arguments_dt[8] = Arguments.mean_longitude_of_mars_derivative()
+            d_arguments_dt[9] = Arguments.mean_longitude_of_jupiter_derivative()
+            d_arguments_dt[10] = Arguments.mean_longitude_of_saturn_derivative()
+            d_arguments_dt[11] = Arguments.mean_longitude_of_uranus_derivative()
+            d_arguments_dt[12] = (
+                Arguments.mean_longitude_of_neptune_derivative())
+            d_arguments_dt[13] = (
+                Arguments
+                .general_precession_in_longitude_derivative(t)
+            )
+
+        # TODO: Finish adding derivative stuff below
+
         non_poly_part = 0.0
+        d_non_poly_part_dt = 0.0
 
         for row in self.data:
             j = row[0]

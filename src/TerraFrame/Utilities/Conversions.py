@@ -309,3 +309,19 @@ def days_to_centuries(value):
     """
 
     return value / (365 * 100)
+
+
+def seconds_to_centuries(value):
+    """
+    This function takes a numeric input representing seconds and scales it to
+    centuries. The convertion assumes there is exactly 365 days in a year.
+
+    :param value: Input value in seconds
+    :type value: int | float
+    :return: Output value in centuries
+    :rtype: int | float
+    """
+
+    value = days_to_centuries(seconds_to_days(value))
+
+    return value
