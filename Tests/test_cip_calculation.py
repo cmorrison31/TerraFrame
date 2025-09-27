@@ -96,6 +96,6 @@ def test_cip_derivatives():
         # noinspection PyTypeChecker
         d_cip_s_dt_fd[i] = Conversions.seconds_to_centuries(d_cip_s_dt_fd[i])
 
-    assert np.max(np.abs(d_cip_x_dt - d_cip_x_dt_fd)) < 1e-13
-    assert np.max(np.abs(d_cip_y_dt - d_cip_y_dt_fd)) < 1e-13
-    assert np.max(np.abs(d_cip_s_dt - d_cip_s_dt_fd)) < 1e-13
+    assert (np.max(np.abs(d_cip_x_dt - d_cip_x_dt_fd)) < 1e-13)
+    assert (np.max(np.abs(d_cip_y_dt - d_cip_y_dt_fd)) < 1e-13)
+    assert (np.max(np.abs(d_cip_s_dt - d_cip_s_dt_fd)) < 1e-13)

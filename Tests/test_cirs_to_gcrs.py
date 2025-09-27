@@ -86,4 +86,4 @@ def test_cirs_to_gcrs_derivative_calculation():
 
     error = np.abs(d_t_gc_dt - d_t_gc_dt_fd)
 
-    assert np.max(error) < 1e-15
+    assert (np.max(error) < 1e-15)
