@@ -62,8 +62,6 @@ def mean_anomaly_of_the_moon_derivative(time):
 
     value = Conversions.arcsec_to_rad(value)
 
-    value = Conversions.seconds_to_centuries(value)
-
     return value
 
 
@@ -120,8 +118,6 @@ def mean_anomaly_of_the_sun_derivative(time):
              0.00004596 * time ** 3)
 
     value = Conversions.arcsec_to_rad(value)
-
-    value = Conversions.seconds_to_centuries(value)
 
     return value
 
@@ -180,8 +176,6 @@ def mean_longitude_moon_minus_ascending_node_derivative(time):
 
     value = Conversions.arcsec_to_rad(value)
 
-    value = Conversions.seconds_to_centuries(value)
-
     return value
 
 
@@ -238,8 +232,6 @@ def mean_elongation_of_the_moon_from_the_sun_derivative(time):
     0.00012676 * time ** 3)
 
     value = Conversions.arcsec_to_rad(value)
-
-    value = Conversions.seconds_to_centuries(value)
 
     return value
 
@@ -298,8 +290,6 @@ def mean_longitude_of_the_ascending_node_of_the_moon_derivative(time):
 
     value = Conversions.arcsec_to_rad(value)
 
-    value = Conversions.seconds_to_centuries(value)
-
     return value
 
 
@@ -324,7 +314,6 @@ def mean_longitude_of_mercury(time):
     # The polynomial is in radians
     value = 4.402608842 + 2608.7903141574 * time
 
-    # Take the modulus before convertion to maintain accuracy
     value = math.fmod(value, 2.0 * math.pi)
 
     return value
@@ -348,8 +337,6 @@ def mean_longitude_of_mercury_derivative():
 
     # The polynomial is in radians
     value = 2608.7903141574
-
-    value = Conversions.seconds_to_centuries(value)
 
     return value
 
@@ -400,8 +387,6 @@ def mean_longitude_of_venus_derivative():
     # The polynomial is in radians
     value = 1021.3285546211
 
-    value = Conversions.seconds_to_centuries(value)
-
     return value
 
 
@@ -450,8 +435,6 @@ def mean_longitude_of_earth_derivative():
 
     # The polynomial is in radians
     value = 628.3075849991
-
-    value = Conversions.seconds_to_centuries(value)
 
     return value
 
@@ -502,8 +485,6 @@ def mean_longitude_of_mars_derivative():
     # The polynomial is in radians
     value = 334.0612426700
 
-    value = Conversions.seconds_to_centuries(value)
-
     return value
 
 
@@ -552,8 +533,6 @@ def mean_longitude_of_jupiter_derivative():
 
     # The polynomial is in radians
     value = 52.9690962641
-
-    value = Conversions.seconds_to_centuries(value)
 
     return value
 
@@ -604,8 +583,6 @@ def mean_longitude_of_saturn_derivative():
     # The polynomial is in radians
     value = 21.3299104960
 
-    value = Conversions.seconds_to_centuries(value)
-
     return value
 
 
@@ -654,8 +631,6 @@ def mean_longitude_of_uranus_derivative():
 
     # The polynomial is in radians
     value = 7.4781598567
-
-    value = Conversions.seconds_to_centuries(value)
 
     return value
 
@@ -706,8 +681,6 @@ def mean_longitude_of_neptune_derivative():
     # The polynomial is in radians
     value = 3.8133035638
 
-    value = Conversions.seconds_to_centuries(value)
-
     return value
 
 
@@ -755,7 +728,5 @@ def general_precession_in_longitude_derivative(time):
 
     # The polynomial is in radians
     value = 0.02438175 + 0.00001077382 * time
-
-    value = Conversions.seconds_to_centuries(value)
 
     return value
