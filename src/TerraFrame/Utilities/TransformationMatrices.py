@@ -391,9 +391,10 @@ def cirs_to_gcrs_derivative(x, y, s, dx_dt, dy_dt, ds_dt):
     dd_dt = (np.sqrt(-1 - 1/(x**2 + y**2 - 1)) * (x * dx_dt + y * dy_dt) /
              (x**2 + y**2))
 
-    dt_gc_dt = (r3(-e) @ r2(-d) @ dr3dt(s, ds_dt) +
-                r3(-e) @ dr2dt(-d, -dd_dt) @ r3(s) +
-                dr3dt(-e, -de_dt) @ r2(-d) @ r3(s))
+    dt_gc_dt = (r3(-e) @ r2(-d) @ r3(e) @ dr3dt(s, ds_dt) +
+                r3(-e) @ r2(-d) @ dr3dt(e, de_dt) @ r3(s) +
+                r3(-e) @ dr2dt(-d, -dd_dt) @ r3(e) @ r3(s) +
+                dr3dt(-e, -de_dt) @ r2(-d) @ r3(e) @ r3(s))
 
     return dt_gc_dt
 

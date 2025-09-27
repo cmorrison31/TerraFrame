@@ -30,6 +30,7 @@ class CelestialTerrestrialTransformation:
         self.t_gc = None
         self.t_ct = None
         self.t_ti = None
+        self.angular_velocity = None
 
     def itrs_to_gcrs(self, time):
         if isinstance(time, datetime.datetime):
@@ -170,7 +171,9 @@ class CelestialTerrestrialTransformation:
             dcip_y_dt += ddy_dt
 
         # Create the first transformation matrix
+        # Q(t)
         t_gc = TransformationMatrices.cirs_to_gcrs(cip_x, cip_y, cip_s)
+        # Q'(t)
         dt_gc_dt = (TransformationMatrices
                     .cirs_to_gcrs_derivative(cip_x, cip_y, cip_s,
                                              dcip_x_dt, dcip_y_dt, dcip_s_dt))
@@ -179,8 +182,10 @@ class CelestialTerrestrialTransformation:
         # Intermediate Reference System (TIRS) to the Celestial Intermediate
         # Reference System (CIRS): TIRS -> CIRS.
         # This function uses normal JD time in UT1.
+        # R(t)
         t_ct = TransformationMatrices.earth_rotation_matrix(jd_ut1)
 
+        # R'(t)
         dt_ct_dt = (TransformationMatrices
                     .earth_rotation_matrix_derivative(jd_ut1))
 
@@ -206,17 +211,24 @@ class CelestialTerrestrialTransformation:
         pm_x = TerraFrame.Utilities.Conversions.arcsec_to_rad(pm_x)
         pm_y = TerraFrame.Utilities.Conversions.arcsec_to_rad(pm_y)
 
+        # W(t)
         t_ti = TransformationMatrices.itrs_to_tirs(pm_x, pm_y, sp)
+        # W'(t)
         dt_ti_dt = TransformationMatrices.itrs_to_tirs_derivative(
             pm_x, pm_y, sp,
             dpm_x_dt, dpm_y_dt, dsp_dt)
 
         # Construct the final transformation matrix: ITRS -> GCRS
+        # GCRS = Q(t) * R(t) * W(t)
         t_gi = t_gc @ t_ct @ t_ti
+
+        angular_vel = (t_gc @ t_ct @ dt_ti_dt +  t_gc @ dt_ct_dt @ t_ti +
+                       dt_ct_dt @ t_ct @ t_ti)
 
         self.t_gi = t_gi
         self.t_gc = t_gc
         self.t_ct = t_ct
         self.t_ti = t_ti
+        self.angular_velocity = angular_vel
 
-        return t_gi
+        return t_gi, angular_vel

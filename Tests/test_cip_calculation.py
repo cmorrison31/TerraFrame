@@ -64,7 +64,6 @@ def test_cip_derivatives():
     d_cip_s_dt = np.zeros((n,))
     d_cip_s_dt_fd = np.zeros((n,))
 
-    #dt = Conversions.seconds_to_centuries(1e-4)
     dt = 1e-6
 
     for i, val in enumerate(frac):
