@@ -198,7 +198,9 @@ class CelestialTerrestrialTransformation:
             pm_x = self.bd.f_pm_x(float(mjd_utc))
             pm_y = self.bd.f_pm_y(float(mjd_utc))
             dpm_x_dt = self.bd.f_pm_x(float(mjd_utc), derivative=True)
+            dpm_x_dt = Conversions.seconds_to_days(dpm_x_dt)
             dpm_y_dt = self.bd.f_pm_y(float(mjd_utc), derivative=True)
+            dpm_y_dt = Conversions.seconds_to_days(dpm_y_dt)
         else:
             pm_x = 0.0
             pm_y = 0.0

@@ -313,8 +313,7 @@ def calculate_s_prime_derivative():
 
     # This is an approximation good for the next century. See section 5.5.2 of
     # IERS Conventions (2010) for more context.
-    dt_s_prime_dt = Conversions.days_to_centuries(-47e-6)
-    dt_s_prime_dt = Conversions.seconds_to_days(dt_s_prime_dt)
+    dt_s_prime_dt = Conversions.seconds_to_centuries(-47e-6)
     dt_s_prime_dt = Conversions.arcsec_to_rad(dt_s_prime_dt)
 
     return dt_s_prime_dt
