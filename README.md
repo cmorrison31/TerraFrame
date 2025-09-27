@@ -45,8 +45,8 @@ post-processing.
 
 # License
 
-This project - except for the IERS data files - is covered under the Mozilla
-Public License Version 2.0 (MPL2). See the LICENSE.txt file for more
+This project - except for the IERS and WGS84 data files - is covered under the 
+Mozilla Public License Version 2.0 (MPL2). See the LICENSE.txt file for more
 information.
 
 # Acknowledgements and References
