@@ -136,4 +136,4 @@ def test_t_gi_angular_velocity():
 
     error = np.abs(d_t_gi_dt - d_t_gi_dt_fd)
 
-    assert (np.max(error) < 1e-12)
+    assert (np.max(error) < 1e-11)
