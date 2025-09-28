@@ -30,7 +30,7 @@ class CelestialTerrestrialTransformation:
         self.t_gc = None
         self.t_ct = None
         self.t_ti = None
-        self.angular_velocity = None
+        self.w_gi = None
 
     def itrs_to_gcrs(self, time):
         if isinstance(time, datetime.datetime):
@@ -237,6 +237,11 @@ class CelestialTerrestrialTransformation:
         self.t_gc = t_gc
         self.t_ct = t_ct
         self.t_ti = t_ti
-        self.angular_velocity = angular_vel
+        self.w_gi = angular_vel
 
         return t_gi, angular_vel
+
+    def gcrs_to_itrs_angular_vel(self, time):
+        t_gi, w_gi = self.itrs_to_gcrs_angular_vel(time)
+
+        return t_gi.T, w_gi.T
