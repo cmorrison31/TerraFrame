@@ -174,7 +174,7 @@ class EarthBase(ABC):
             c = cn1
 
             # It's symbol soup. No way around it. If you want this to make
-            # sense, you'll have to look at the source paper: Fukushima 2006.
+            # sense, you'll have to look at the reference paper: Fukushima 2006.
             a = math.sqrt(s ** 2 + c ** 2)
             b = 1.5 * e * s * c ** 2 * ((p * s - zb * c) * a - e * s * c)
             f = p * a ** 3 - e * c ** 3
