@@ -6,12 +6,21 @@ TerraFrame is a library designed to provided key Earth related calculations and
 associated functionality to modeling & simulation software. Primarily, 
 TerraFrame provides Earth orientation and gravity routines.
 
+![Animation of CGRS to ITRS Transformation](https://raw.githubusercontent.com/cmorrison31/TerraFrame/main/Animations%20and%20Plots/GCRS_to_ITRS.gif)
+
+![Example of Precession, Nutation, & Polar Motion](https://raw.githubusercontent.com/cmorrison31/TerraFrame/main/Animations%20and%20Plots/Earth%20Motion%20Example.gif)
+
 ## Earth Orientation
 TerraFrame provides an implementation of the IAU 2006/2000A precession-nutation 
 model which accounts for precession, nutation, and polar motion. Specifically, 
 this implementation provides a transformation tensor between the Geocentric 
 Celestial Reference System (GCRS) and the International Terrestrial Reference 
 System (ITRS).
+
+TerraFrame also provides routines for calculating the Earth's angular 
+velocity tensor. The angular velocity tensor is based on the partial 
+derivative of the numerous IAU 2006/2000A equations with respect to time (in 
+seconds).
 
 IERS precession and nutation model data files are shipped with TerraFrame. 
 Utility code is also provided which automates the downloading of IERS data for 
@@ -38,10 +47,6 @@ that is fully leap second aware. Conversions between UTC, UT1, TT, and TAI are
 provided. The user is encouraged to not work in UTC directly to avoid leap 
 second ambiguity. Conversion to UTC from TT or TAI can be safely done in 
 post-processing.
-
-![Animation of CGRS to ITRS Transformation](https://raw.githubusercontent.com/cmorrison31/TerraFrame/main/Animations%20and%20Plots/GCRS_to_ITRS.gif)
-
-![Example of Precession, Nutation, & Polar Motion](https://raw.githubusercontent.com/cmorrison31/TerraFrame/main/Animations%20and%20Plots/Earth%20Motion%20Example.gif)
 
 # License
 
