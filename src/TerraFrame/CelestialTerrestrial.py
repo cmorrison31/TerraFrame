@@ -12,15 +12,15 @@ from TerraFrame.Utilities.Time.JulianDate import JulianDate
 
 
 class CelestialTerrestrialTransformation:
-    def __init__(self, user_polar_motion=True, user_nutation_corrections=True):
+    def __init__(self, use_polar_motion=True, use_nutation_corrections=True):
         self.se_cip_x = SeriesExpansion.cip_x()
         self.se_cip_y = SeriesExpansion.cip_y()
         self.se_cip_sxy2 = SeriesExpansion.cip_sxy2()
 
-        self._user_polar_motion = user_polar_motion
-        self._user_nutation_corrections = user_nutation_corrections
+        self._use_polar_motion = use_polar_motion
+        self._use_nutation_corrections = use_nutation_corrections
 
-        if not self._user_polar_motion and not self._user_nutation_corrections:
+        if not self._use_polar_motion and not self._use_nutation_corrections:
             self.bd = None
         else:
             self.bd = BulletinData.BulletinData()
@@ -68,7 +68,7 @@ class CelestialTerrestrialTransformation:
         # Reference System (CIRS) to Geocentric Celestial Reference System
         # (GCRS) matrix: CIRS -> GCRS.
         # Get corrections by interpolating in the IERS Bulletin A data
-        if self._user_nutation_corrections:
+        if self._use_nutation_corrections:
             dx = self.bd.f_nc_dx(float(mjd_utc))
             dy = self.bd.f_nc_dy(float(mjd_utc))
 
@@ -89,7 +89,7 @@ class CelestialTerrestrialTransformation:
         # Terrestrial Reference System (ITRS) to Terrestrial Intermediate
         # Reference System (TIRS) transformation matrix can be constructed:
         # ITRS -> TIRS.
-        if self._user_polar_motion:
+        if self._use_polar_motion:
             pm_x = self.bd.f_pm_x(float(mjd_utc))
             pm_y = self.bd.f_pm_y(float(mjd_utc))
         else:
@@ -117,7 +117,6 @@ class CelestialTerrestrialTransformation:
         t_gi = self.itrs_to_gcrs(time)
 
         return t_gi.T
-
 
     def itrs_to_gcrs_angular_vel(self, time):
         if isinstance(time, datetime.datetime):
@@ -157,7 +156,7 @@ class CelestialTerrestrialTransformation:
         # Reference System (CIRS) to Geocentric Celestial Reference System
         # (GCRS) matrix: CIRS -> GCRS.
         # Get corrections by interpolating in the IERS Bulletin A data
-        if self._user_nutation_corrections:
+        if self._use_nutation_corrections:
             dx = self.bd.f_nc_dx(float(mjd_utc))
             dy = self.bd.f_nc_dy(float(mjd_utc))
 
@@ -165,7 +164,11 @@ class CelestialTerrestrialTransformation:
             cip_y += Conversions.mas_to_rad(dy)
 
             ddx_dt = self.bd.f_nc_dx(float(mjd_utc), derivative=True)
+            ddx_dt = Conversions.mas_to_rad(ddx_dt)
+            ddx_dt = Conversions.seconds_to_days(ddx_dt)
             ddy_dt = self.bd.f_nc_dy(float(mjd_utc), derivative=True)
+            ddy_dt = Conversions.mas_to_rad(ddy_dt)
+            ddy_dt = Conversions.seconds_to_days(ddy_dt)
 
             dcip_x_dt += ddx_dt
             dcip_y_dt += ddy_dt
@@ -174,9 +177,10 @@ class CelestialTerrestrialTransformation:
         # Q(t)
         t_gc = TransformationMatrices.cirs_to_gcrs(cip_x, cip_y, cip_s)
         # Q'(t)
-        dt_gc_dt = (TransformationMatrices
-                    .cirs_to_gcrs_derivative(cip_x, cip_y, cip_s,
-                                             dcip_x_dt, dcip_y_dt, dcip_s_dt))
+        dt_gc_dt = (
+            TransformationMatrices.cirs_to_gcrs_derivative(cip_x, cip_y, cip_s,
+                                                           dcip_x_dt, dcip_y_dt,
+                                                           dcip_s_dt))
 
         # The Earth rotation matrix is the transformation from the Terrestrial
         # Intermediate Reference System (TIRS) to the Celestial Intermediate
@@ -186,20 +190,24 @@ class CelestialTerrestrialTransformation:
         t_ct = TransformationMatrices.earth_rotation_matrix(jd_ut1)
 
         # R'(t)
-        dt_ct_dt = (TransformationMatrices
-                    .earth_rotation_matrix_derivative(jd_ut1))
+        dt_ct_dt = (
+            TransformationMatrices.earth_rotation_matrix_derivative(jd_ut1))
 
         # Given polar motion offsets pm_x and pm_y, along with the Terrestrial
         # Intermediate Origin (TIO) locator (s prime or sp), the International
         # Terrestrial Reference System (ITRS) to Terrestrial Intermediate
         # Reference System (TIRS) transformation matrix can be constructed:
         # ITRS -> TIRS.
-        if self._user_polar_motion:
+        if self._use_polar_motion:
             pm_x = self.bd.f_pm_x(float(mjd_utc))
             pm_y = self.bd.f_pm_y(float(mjd_utc))
+            pm_x = Conversions.arcsec_to_rad(pm_x)
+            pm_y = Conversions.arcsec_to_rad(pm_y)
             dpm_x_dt = self.bd.f_pm_x(float(mjd_utc), derivative=True)
+            dpm_x_dt = Conversions.arcsec_to_rad(dpm_x_dt)
             dpm_x_dt = Conversions.seconds_to_days(dpm_x_dt)
             dpm_y_dt = self.bd.f_pm_y(float(mjd_utc), derivative=True)
+            dpm_y_dt = Conversions.arcsec_to_rad(dpm_y_dt)
             dpm_y_dt = Conversions.seconds_to_days(dpm_y_dt)
         else:
             pm_x = 0.0
@@ -210,22 +218,20 @@ class CelestialTerrestrialTransformation:
         sp = TransformationMatrices.calculate_s_prime(jdc_tt)
         dsp_dt = TransformationMatrices.calculate_s_prime_derivative()
 
-        pm_x = TerraFrame.Utilities.Conversions.arcsec_to_rad(pm_x)
-        pm_y = TerraFrame.Utilities.Conversions.arcsec_to_rad(pm_y)
-
         # W(t)
         t_ti = TransformationMatrices.itrs_to_tirs(pm_x, pm_y, sp)
         # W'(t)
-        dt_ti_dt = TransformationMatrices.itrs_to_tirs_derivative(
-            pm_x, pm_y, sp,
-            dpm_x_dt, dpm_y_dt, dsp_dt)
+        dt_ti_dt = TransformationMatrices.itrs_to_tirs_derivative(pm_x, pm_y,
+            sp, dpm_x_dt, dpm_y_dt, dsp_dt)
 
         # Construct the final transformation matrix: ITRS -> GCRS
         # GCRS = Q(t) * R(t) * W(t)
         t_gi = t_gc @ t_ct @ t_ti
 
-        angular_vel = (t_gc @ t_ct @ dt_ti_dt +  t_gc @ dt_ct_dt @ t_ti +
-                       dt_ct_dt @ t_ct @ t_ti)
+        d_t_gi_dt = (t_gc @ t_ct @ dt_ti_dt + t_gc @ dt_ct_dt @ t_ti +
+                     dt_gc_dt @ t_ct @ t_ti)
+
+        angular_vel = d_t_gi_dt.T @ t_gi
 
         self.t_gi = t_gi
         self.t_gc = t_gc

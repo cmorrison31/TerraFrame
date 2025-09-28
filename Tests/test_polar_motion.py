@@ -64,9 +64,13 @@ def test_itrs_to_tirs_derivative_calculation():
 
     pm_x = bd.f_pm_x(float(mjd_utc))
     pm_y = bd.f_pm_y(float(mjd_utc))
+    pm_x = Conversions.arcsec_to_rad(pm_x)
+    pm_y = Conversions.arcsec_to_rad(pm_y)
     dpm_x_dt = bd.f_pm_x(float(mjd_utc), derivative=True)
+    dpm_x_dt = Conversions.arcsec_to_rad(dpm_x_dt)
     dpm_x_dt = Conversions.seconds_to_days(dpm_x_dt)
     dpm_y_dt = bd.f_pm_y(float(mjd_utc), derivative=True)
+    dpm_y_dt = Conversions.arcsec_to_rad(dpm_y_dt)
     dpm_y_dt = Conversions.seconds_to_days(dpm_y_dt)
 
     sp = TransformationMatrices.calculate_s_prime(jdc_tt)
@@ -77,10 +81,14 @@ def test_itrs_to_tirs_derivative_calculation():
 
     pm_x2 = bd.f_pm_x(float(mjd_utc) + dt)
     pm_y2 = bd.f_pm_y(float(mjd_utc) + dt)
+    pm_x2 = Conversions.arcsec_to_rad(pm_x2)
+    pm_y2 = Conversions.arcsec_to_rad(pm_y2)
     sp2 = TransformationMatrices.calculate_s_prime(jdc_tt + dtc)
 
     pm_x1 = bd.f_pm_x(float(mjd_utc) - dt)
     pm_y1 = bd.f_pm_y(float(mjd_utc) - dt)
+    pm_x1 = Conversions.arcsec_to_rad(pm_x1)
+    pm_y1 = Conversions.arcsec_to_rad(pm_y1)
     sp1 = TransformationMatrices.calculate_s_prime(jdc_tt - dtc)
 
     f2 = TransformationMatrices.itrs_to_tirs(pm_x2, pm_y2, sp2)

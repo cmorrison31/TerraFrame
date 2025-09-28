@@ -26,8 +26,9 @@ def test_itrs_to_gcrs_calculation():
     jd_ut1 = Conversions.utc_to_ut1(jd_utc)
 
     # No corrections since we're comparing against a bare ERFA routine
-    ct = (TerraFrame.CelestialTerrestrialTransformation(user_polar_motion=False,
-        user_nutation_corrections=False))
+    ct = (TerraFrame.
+          CelestialTerrestrialTransformation(use_polar_motion=False,
+                                             use_nutation_corrections=False))
 
     t_ig = ct.itrs_to_gcrs(jd_tt)
 
@@ -49,8 +50,9 @@ def test_against_astropy():
 
     # Apparently, Astropy doesn't use the dx and dy nutation corrections.
     # See: https://github.com/astropy/astropy/issues/11110
-    ct = (TerraFrame.CelestialTerrestrialTransformation(user_polar_motion=True,
-        user_nutation_corrections=False))
+    ct = (TerraFrame.
+          CelestialTerrestrialTransformation(use_polar_motion=True,
+                                             use_nutation_corrections=False))
 
     t_ig = ct.gcrs_to_itrs(jd_utc)
 
@@ -83,8 +85,9 @@ def test_leap_second_against_astropy():
 
     # Apparently, Astropy doesn't use the dx and dy nutation corrections.
     # See: https://github.com/astropy/astropy/issues/11110
-    ct = (TerraFrame.CelestialTerrestrialTransformation(user_polar_motion=True,
-        user_nutation_corrections=False))
+    ct = (TerraFrame.
+          CelestialTerrestrialTransformation(use_polar_motion=True,
+                                             use_nutation_corrections=False))
 
     bd = BulletinData.BulletinData()
     file_path = bd.dat_file_path()
@@ -104,9 +107,33 @@ def test_leap_second_against_astropy():
         t = astropy.time.Time(jd_tt.integer_part(), jd_tt.fraction_part(),
                               format='jd', scale='tt')
 
-        gcrs_basis_astro = GCRS(CartesianRepresentation(gcrs_basis, unit=u.one),
-                                obstime=t)
+        gcrs_basis_astro = GCRS(CartesianRepresentation(gcrs_basis,
+                                                        unit=u.one), obstime=t)
         itrs_basis_astro = gcrs_basis_astro.transform_to(ITRS(obstime=t))
         itrs_basis_astro = itrs_basis_astro.cartesian.xyz.to_value()
 
         assert (np.max(np.abs(itrs_basis - itrs_basis_astro)) < 1e-10)
+
+def test_t_gi_angular_velocity():
+    val = random.uniform(0, 100.0)
+    jd_tt = (JulianDate.JulianDate.j2000(
+        time_scale=JulianDate.TimeScales.TT) + val)
+
+    dt = 1e-6
+
+    ct = TerraFrame.CelestialTerrestrialTransformation(use_polar_motion=True,
+                                            use_nutation_corrections=True)
+
+    f2, _ = ct.itrs_to_gcrs_angular_vel(jd_tt + dt)
+    f1, _ = ct.itrs_to_gcrs_angular_vel(jd_tt - dt)
+
+    d_t_gi_dt_fd = (f2 - f1) / (2 * dt)
+    d_t_gi_dt_fd *= Conversions.seconds_to_days(1.0)
+
+    t_gi, d_t_gi_dt = ct.itrs_to_gcrs_angular_vel(jd_tt)
+
+    d_t_gi_dt_fd = d_t_gi_dt_fd.T @ t_gi
+
+    error = np.abs(d_t_gi_dt - d_t_gi_dt_fd)
+
+    assert (np.max(error) < 1e-12)
