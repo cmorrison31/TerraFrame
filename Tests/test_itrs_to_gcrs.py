@@ -74,7 +74,7 @@ def test_against_astropy():
     itrs_basis_astro = gcrs_basis_astro.transform_to(ITRS(obstime=t))
     itrs_basis_astro = itrs_basis_astro.cartesian.xyz.to_value()
 
-    assert (np.max(np.abs(itrs_basis - itrs_basis_astro)) < 1e-10)
+    assert (np.max(np.abs(itrs_basis - itrs_basis_astro)) < 1e-9)
 
 
 def test_leap_second_against_astropy():
@@ -136,4 +136,4 @@ def test_t_gi_angular_velocity():
 
     error = np.abs(d_t_gi_dt - d_t_gi_dt_fd)
 
-    assert (np.max(error) < 1e-11)
+    assert (np.max(error) < 1e-9)

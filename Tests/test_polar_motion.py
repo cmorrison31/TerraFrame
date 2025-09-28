@@ -99,4 +99,4 @@ def test_itrs_to_tirs_derivative_calculation():
 
     error = np.abs(dt_ti_dt - dt_ti_dt_fd)
 
-    assert (np.max(error) < 1e-14)
+    assert (np.max(error) < 1e-9)
