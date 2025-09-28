@@ -8,7 +8,7 @@ import erfa
 import numpy as np
 
 import TerraFrame.Earth
-from TerraFrame.Utilities import TransformationMatrices
+from TerraFrame.Utilities import TransformationMatrices, Conversions
 from TerraFrame.Utilities.Time import JulianDate
 
 
@@ -38,3 +38,23 @@ def test_era_transformation_calculation():
     t_e_erfa = TransformationMatrices.r3(-era_a)
 
     assert (np.max(np.abs(t_e - t_e_erfa)) < 1e-10)
+
+
+def test_era_transformation_derivative_calculation():
+    val = random.uniform(0, 100.0)
+    jd_ut1 = (JulianDate.JulianDate.j2000(
+        time_scale=JulianDate.TimeScales.UT1) + val)
+
+    dt = 1e-6
+
+    t_e2 = TransformationMatrices.earth_rotation_matrix(jd_ut1 + dt)
+    t_e1 = TransformationMatrices.earth_rotation_matrix(jd_ut1 - dt)
+
+    d_te_dt_fd = (t_e2 - t_e1) / (2 * dt)
+    d_te_dt_fd *= Conversions.seconds_to_days(1)
+
+    d_te_dt = TransformationMatrices.earth_rotation_matrix_derivative(jd_ut1)
+
+    error = np.abs(d_te_dt - d_te_dt_fd)
+
+    assert (np.max(error) < 1e-13)

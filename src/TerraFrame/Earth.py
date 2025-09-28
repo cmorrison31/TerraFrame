@@ -5,7 +5,7 @@
 import math
 from abc import ABC, abstractmethod
 
-from TerraFrame.Utilities import Time
+from TerraFrame.Utilities import Time, Conversions
 from TerraFrame.Utilities.Time import JulianDate
 
 
@@ -174,7 +174,7 @@ class EarthBase(ABC):
             c = cn1
 
             # It's symbol soup. No way around it. If you want this to make
-            # sense, you'll have to look at the source paper: Fukushima 2006.
+            # sense, you'll have to look at the reference paper: Fukushima 2006.
             a = math.sqrt(s ** 2 + c ** 2)
             b = 1.5 * e * s * c ** 2 * ((p * s - zb * c) * a - e * s * c)
             f = p * a ** 3 - e * c ** 3
@@ -308,3 +308,18 @@ def earth_rotation_angle(time):
     era = math.fmod(era, 2.0 * math.pi)
 
     return era
+
+
+def earth_rotation_angle_derivative():
+    """
+    This function computes the time derivative of the earth rotation angle at a
+    given datetime in UT1.
+
+    :return: Earth rotation angle in radians/sec
+    :rtype: float
+    """
+
+    dera_dt = 2.0 * math.pi * 1.00273781191135448
+    dera_dt = Conversions.seconds_to_days(dera_dt)
+
+    return dera_dt

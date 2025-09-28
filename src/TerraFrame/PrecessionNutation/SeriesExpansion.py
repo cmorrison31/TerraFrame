@@ -52,19 +52,39 @@ class CipCoordinate(SeriesExpansion):
         super().__init__(data_file_path)
         self._polynomial_coefficients = polynomial_coefficients
 
-    def compute(self, t):
+    def compute(self, t, derivative=False):
+        """
+        This function evaluates a celestial intermediate pole (CIP) series at
+        the given Julian century date.
+
+        :param t: Time as a Julian Century Date (jdc)
+        :type t: JulianDate
+        :param derivative: Compute the time derivative of the series
+                           (default false)
+        :type derivative: bool
+        :return: The computed series value at time t and optionally the series
+        time derivative
+        :rtype: float | float, float
+        """
+
         t = float(t)
 
         # units are micro-arcseconds
         poly_part = 0.0
+        poly_part_dt = 0.0
 
         for j in range(len(self._polynomial_coefficients)):
             poly_part += self._polynomial_coefficients[j] * t ** j
+
+        if derivative:
+            for j in range(1, len(self._polynomial_coefficients)):
+                poly_part_dt += self._polynomial_coefficients[j] * t ** (j - 1)
 
         # Initialize all the argument parameters. "argument" is the term that
         # IERS uses to refer to the input to the trigonometric functions. The
         # order is tightly coupled with the file format.
         arguments = np.zeros((14, ))
+        d_arguments_dt = np.zeros((14, ))
 
         arguments[0] = Arguments.mean_anomaly_of_the_moon(t) # l
         arguments[1] = Arguments.mean_anomaly_of_the_sun(t) # l'
@@ -82,7 +102,37 @@ class CipCoordinate(SeriesExpansion):
         arguments[12] = Arguments.mean_longitude_of_neptune(t) # L_Ne
         arguments[13] = Arguments.general_precession_in_longitude(t) # p_A
 
+        if derivative:
+            d_arguments_dt[0] = Arguments.mean_anomaly_of_the_moon_derivative(t)
+            d_arguments_dt[1] = Arguments.mean_anomaly_of_the_sun_derivative(t)
+            d_arguments_dt[2] = (
+                Arguments
+                .mean_longitude_moon_minus_ascending_node_derivative(t)
+            )
+            d_arguments_dt[3] = (
+                Arguments
+                .mean_elongation_of_the_moon_from_the_sun_derivative(t)
+            )
+            d_arguments_dt[4] = (
+                Arguments
+                .mean_longitude_of_the_ascending_node_of_the_moon_derivative(t)
+            )
+            d_arguments_dt[5] = Arguments.mean_longitude_of_mercury_derivative()
+            d_arguments_dt[6] = Arguments.mean_longitude_of_venus_derivative()
+            d_arguments_dt[7] = Arguments.mean_longitude_of_earth_derivative()
+            d_arguments_dt[8] = Arguments.mean_longitude_of_mars_derivative()
+            d_arguments_dt[9] = Arguments.mean_longitude_of_jupiter_derivative()
+            d_arguments_dt[10] = Arguments.mean_longitude_of_saturn_derivative()
+            d_arguments_dt[11] = Arguments.mean_longitude_of_uranus_derivative()
+            d_arguments_dt[12] = (
+                Arguments.mean_longitude_of_neptune_derivative())
+            d_arguments_dt[13] = (
+                Arguments
+                .general_precession_in_longitude_derivative(t)
+            )
+
         non_poly_part = 0.0
+        d_non_poly_part_dt = 0.0
 
         for row in self.data:
             j = row[0]
@@ -91,13 +141,37 @@ class CipCoordinate(SeriesExpansion):
 
             arg = np.linalg.vecdot(row[4:], arguments)
 
-            non_poly_part += (a_s * np.sin(arg) + a_c * np.cos(arg)) * t ** j
+            arg_p = np.linalg.vecdot(row[4:], d_arguments_dt)
+
+            tmp = a_s * np.sin(arg) + a_c * np.cos(arg)
+
+            non_poly_part += tmp * t ** j
+
+            if derivative:
+                tmp2 = (a_s * np.cos(arg) - a_c * np.sin(arg)) * arg_p
+
+                # Avoid a numerical issue with the generic formula when j = 0
+                if j > 0:
+                    d_non_poly_part_dt += j * t ** (j - 1) * tmp + t ** j * tmp2
+                else:
+                    d_non_poly_part_dt += tmp2
+
 
         total = poly_part + non_poly_part
 
-        total = Conversions.muas_to_rad(total)
+        total_dt = poly_part_dt + d_non_poly_part_dt
 
-        return total
+        total = Conversions.muas_to_rad(total)
+        total_dt = Conversions.muas_to_rad(total_dt)
+
+        # Up till this point, we've been computing the derivative with
+        # respect to centuries. Change it to be with respect to seconds.
+        total_dt = Conversions.seconds_to_centuries(total_dt)
+
+        if derivative:
+            return total, total_dt
+        else:
+            return total
 
 
 def cip_x(file_name=r'tab5.2a.txt'):

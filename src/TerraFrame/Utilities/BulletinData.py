@@ -9,7 +9,7 @@ import numpy as np
 import numpy.typing as npt
 
 from .DataFiles import DataFileManager
-from .Interpolation import Interpolation1D
+from .Interpolation import InterpolationPchip
 
 
 class BulletinData:
@@ -84,16 +84,16 @@ class BulletinData:
 
     def _init_interpolants(self):
         if BulletinData.f_pm_x is None:
-            BulletinData.f_pm_x = Interpolation1D(self.data[:, 0],
+            BulletinData.f_pm_x = InterpolationPchip(self.data[:, 0],
                                                   self.data[:, 2])
 
-            BulletinData.f_pm_y = Interpolation1D(self.data[:, 0],
+            BulletinData.f_pm_y = InterpolationPchip(self.data[:, 0],
                                                   self.data[:, 3])
 
-            BulletinData.f_nc_dx = Interpolation1D(self.data[:, 0],
+            BulletinData.f_nc_dx = InterpolationPchip(self.data[:, 0],
                                                    self.data[:, 4])
 
-            BulletinData.f_nc_dy = Interpolation1D(self.data[:, 0],
+            BulletinData.f_nc_dy = InterpolationPchip(self.data[:, 0],
                                                    self.data[:, 5])
 
     def _parse_file(self):

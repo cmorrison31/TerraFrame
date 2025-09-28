@@ -7,6 +7,7 @@ import numpy as np
 
 from TerraFrame.PrecessionNutation import SeriesExpansion
 from TerraFrame.Utilities.Time import JulianDate
+from TerraFrame.Utilities import Conversions
 
 
 def test_cip_calculation():
@@ -46,3 +47,55 @@ def test_cip_calculation():
     assert np.max(np.abs(cip_x - cip_x_a)) < 1e-10
     assert np.max(np.abs(cip_y - cip_y_a)) < 1e-10
     assert np.max(np.abs(cip_s - cip_s_a)) < 1e-10
+
+
+def test_cip_derivatives():
+    se_cip_x = SeriesExpansion.cip_x()
+    se_cip_y = SeriesExpansion.cip_y()
+    se_cip_sxy2 = SeriesExpansion.cip_sxy2()
+
+    n = 10
+    frac = np.linspace(0, 365.25 * 100, n)
+
+    d_cip_x_dt = np.zeros((n,))
+    d_cip_x_dt_fd = np.zeros((n,))
+    d_cip_y_dt = np.zeros((n,))
+    d_cip_y_dt_fd = np.zeros((n,))
+    d_cip_s_dt = np.zeros((n,))
+    d_cip_s_dt_fd = np.zeros((n,))
+
+    dt = 1e-6
+
+    for i, val in enumerate(frac):
+        jd_tt = (JulianDate.JulianDate.j2000(
+            time_scale=JulianDate.TimeScales.TT) + val)
+        jdc_tt = JulianDate.julian_day_datetime_to_century_datetime(jd_tt)
+
+        _, d_cip_x_dt[i] = se_cip_x.compute(jdc_tt, derivative=True)
+        _, d_cip_y_dt[i] = se_cip_y.compute(jdc_tt, derivative=True)
+        _, d_cip_s_dt[i] = se_cip_sxy2.compute(jdc_tt, derivative=True)
+
+        f2 = se_cip_x.compute(jdc_tt + 1 * dt)
+        f1 = se_cip_x.compute(jdc_tt - 1 * dt)
+
+        d_cip_x_dt_fd[i] = (f2 - f1) / (2 * dt)
+        # noinspection PyTypeChecker
+        d_cip_x_dt_fd[i] = Conversions.seconds_to_centuries(d_cip_x_dt_fd[i])
+
+        f2 = se_cip_y.compute(jdc_tt + 1 * dt)
+        f1 = se_cip_y.compute(jdc_tt - 1 * dt)
+
+        d_cip_y_dt_fd[i] = (f2 - f1) / (2 * dt)
+        # noinspection PyTypeChecker
+        d_cip_y_dt_fd[i] = Conversions.seconds_to_centuries(d_cip_y_dt_fd[i])
+
+        f2 = se_cip_sxy2.compute(jdc_tt + 1 * dt)
+        f1 = se_cip_sxy2.compute(jdc_tt - 1 * dt)
+
+        d_cip_s_dt_fd[i] = (f2 - f1) / (2 * dt)
+        # noinspection PyTypeChecker
+        d_cip_s_dt_fd[i] = Conversions.seconds_to_centuries(d_cip_s_dt_fd[i])
+
+    assert (np.max(np.abs(d_cip_x_dt - d_cip_x_dt_fd)) < 1e-13)
+    assert (np.max(np.abs(d_cip_y_dt - d_cip_y_dt_fd)) < 1e-13)
+    assert (np.max(np.abs(d_cip_s_dt - d_cip_s_dt_fd)) < 1e-13)
