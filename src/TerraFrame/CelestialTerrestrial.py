@@ -240,6 +240,7 @@ class CelestialTerrestrialTransformation:
         n1 = np.linalg.norm(angular_vel, 'fro')
         angular_vel = 0.5 * (angular_vel - angular_vel.T)
         n2 = np.linalg.norm(angular_vel, 'fro')
+        # noinspection PyTypeChecker
         angular_vel *= (n1 / n2)
 
         self.t_gi = t_gi
