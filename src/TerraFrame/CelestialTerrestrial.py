@@ -3,6 +3,7 @@
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 import datetime
+import numpy as np
 
 import TerraFrame.Utilities.Conversions
 from TerraFrame.PrecessionNutation import SeriesExpansion
@@ -232,6 +233,14 @@ class CelestialTerrestrialTransformation:
                      dt_gc_dt @ t_ct @ t_ti)
 
         angular_vel = d_t_gi_dt.T @ t_gi
+
+        # Enforce skew symmetry and maintain Frobenius norm.
+        # This is mostly to correct for very, very tiny numerical errors on
+        # the diagonal that we know for a fact shouldn't be there.
+        n1 = np.linalg.norm(angular_vel, 'fro')
+        angular_vel = 0.5 * (angular_vel - angular_vel.T)
+        n2 = np.linalg.norm(angular_vel, 'fro')
+        angular_vel *= (n1 / n2)
 
         self.t_gi = t_gi
         self.t_gc = t_gc
