@@ -206,7 +206,7 @@ class JulianBase:
 
 class JulianDate(JulianBase):
     """
-    This class is a realisation of a Julian Day Date (JD) using the JulianBase
+    This class is a realization of a Julian Day Date (JD) using the JulianBase
     class.
 
     A Julian date is defined as the number of days since January 1, 4713, B.C.
@@ -459,7 +459,7 @@ def julian_date_from_pydatetime(dt):
     """
 
     return julian_date_from_datetime(dt.year, dt.month, dt.day, dt.hour,
-                                     dt.minute, dt.microsecond)
+                                     dt.minute, dt.second, dt.microsecond)
 
 
 def julian_day_datetime_to_century_datetime(jd):
