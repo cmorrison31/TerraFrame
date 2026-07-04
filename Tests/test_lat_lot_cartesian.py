@@ -48,3 +48,37 @@ def test_lat_lon_cartesian_wgs84_earth(random_lat_lon_alt):
 
     for i, (lat, lon, alt) in enumerate(zip(*random_lat_lon_alt)):
         helper(earth, lat, lon, alt)
+
+
+def test_lat_lon_cartesian_edge_cases(random_lat_lon_alt):
+    earth = Earth.WGS84Ellipsoid()
+
+    x = earth.semi_major_axis()
+    y = 0.0
+    z = 0.0
+
+    lat, lon, alt = earth.lat_lon_alt_from_cartesian(x, y, z)
+
+    assert abs(lat) < 1e-16
+    assert abs(lon) < 1e-16
+    assert abs(alt) < 1e-16
+
+    x = 0.0
+    y = 0.0
+    z = earth.semi_minor_axis()
+
+    lat, lon, alt = earth.lat_lon_alt_from_cartesian(x, y, z)
+
+    assert abs(lat - math.pi / 2.0) < 1e-16
+    assert abs(lon) < 1e-16
+    assert abs(alt) < 1e-16
+
+    x = 0.0
+    y = 0.0
+    z = -earth.semi_minor_axis()
+
+    lat, lon, alt = earth.lat_lon_alt_from_cartesian(x, y, z)
+
+    assert abs(lat + math.pi / 2.0) < 1e-16
+    assert abs(lon) < 1e-16
+    assert abs(alt) < 1e-16
