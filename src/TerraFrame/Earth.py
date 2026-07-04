@@ -3,6 +3,7 @@
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 import math
+import sys
 from abc import ABC, abstractmethod
 
 from TerraFrame.Utilities import Time, Conversions
@@ -17,6 +18,11 @@ class EarthBase(ABC):
     @property
     @abstractmethod
     def semi_major_axis(self):
+        pass
+
+    @property
+    @abstractmethod
+    def semi_minor_axis(self):
         pass
 
     @property
@@ -62,7 +68,7 @@ class EarthBase(ABC):
         e2 = self.eccentricity() ** 2
 
         # (Radius / a)^2
-        roa2 = (1.0 - e2) / (1.0 - e2 * math.cos(lat_geocentric)**2)
+        roa2 = (1.0 - e2) / (1.0 - e2 * math.cos(lat_geocentric) ** 2)
 
         r = self.semi_major_axis() * math.sqrt(roa2)
 
@@ -157,6 +163,14 @@ class EarthBase(ABC):
 
         ec = math.sqrt(1.0 - self.eccentricity() ** 2)
         pl = math.sqrt(x ** 2 + y ** 2)
+
+        # Poles special case
+        if pl <= sys.float_info.epsilon:
+            lat = math.copysign(math.pi / 2.0, z)
+            lon = 0.0
+            alt = abs(z) - self.semi_minor_axis()
+
+            return lat, lon, alt
 
         a_inv = 1.0 / self.semi_major_axis()
 
@@ -263,6 +277,9 @@ class SphericalEarth(EarthBase):
     def semi_major_axis(self):
         return self._r
 
+    def semi_minor_axis(self):
+        return self._r
+
     def flattening(self):
         return self._f
 
@@ -275,10 +292,14 @@ class WGS84Ellipsoid(EarthBase):
         super().__init__()
         self._a = 6378137.0  # meters, per WGS84
         self._f = 1.0 / 298.257223563  # per WGS84
+        self._b = self._a * (1 - self._f)
         self._e = math.sqrt(2 * self._f - self._f ** 2)
 
     def semi_major_axis(self):
         return self._a
+
+    def semi_minor_axis(self):
+        return self._b
 
     def flattening(self):
         return self._f
